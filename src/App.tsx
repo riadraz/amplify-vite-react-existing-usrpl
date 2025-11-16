@@ -1,39 +1,37 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-
-const client = generateClient<Schema>();
+import React from "react";
+import { startLogin } from "./auth/login";
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const accessToken = localStorage.getItem("access_token");
 
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+  async function createItem() {
+    const res = await fetch(import.meta.env.VITE_API_URL + "/items", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: "1", name: "hello" }),
     });
-  }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+    console.log(await res.json());
+  }
+
+  if (!accessToken) {
+    return (
+      <div className="login-page">
+        <button onClick={startLogin}>
+          Login with Cognito
+        </button>
+      </div>
+    );
   }
 
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
+    <div className="align-center">
+      <h2>Welcome</h2>
+      <button onClick={createItem}>Create DynamoDB Item</button>
+    </div>
   );
 }
 
