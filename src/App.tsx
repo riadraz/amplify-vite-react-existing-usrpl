@@ -1,4 +1,4 @@
-import React from "react";
+import "./App.css";
 import { startLogin } from "./auth/login";
 
 function App() {
