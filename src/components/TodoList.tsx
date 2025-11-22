@@ -34,37 +34,58 @@ export function TodoList() {
     }
   };
 
+  const handleDeleteTodo = async (id: string) => {
+    await client.models.Todo.delete({ id });
+  };
+
   return (
     <div>
-      {isAdding ? (
-        <div style={{ marginBottom: '1rem' }}>
-          <input
-            type="text"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Enter todo content..."
-            autoFocus
-            style={{ 
-              padding: '8px', 
-              marginRight: '8px', 
-              border: '1px solid #ccc', 
-              borderRadius: '4px',
-              minWidth: '200px'
-            }}
-          />
-          <button onClick={handleAddTodo} style={{ marginRight: '4px' }}>Add</button>
-          <button onClick={() => { setNewTodo(""); setIsAdding(false); }}>Cancel</button>
-        </div>
-      ) : (
-        <button onClick={() => setIsAdding(true)} style={{ marginBottom: '1rem' }}>
-          + new
-        </button>
-      )}
+      <div style={{ height: '60px', marginBottom: '1rem', display: 'flex', alignItems: 'flex-start' }}>
+        {isAdding ? (
+          <div>
+            <input
+              type="text"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Enter todo content..."
+              autoFocus
+              style={{ 
+                padding: '8px', 
+                marginRight: '8px', 
+                border: '1px solid #ccc', 
+                borderRadius: '4px',
+                minWidth: '200px'
+              }}
+            />
+            <button onClick={handleAddTodo} style={{ marginRight: '4px' }}>Add</button>
+            <button onClick={() => { setNewTodo(""); setIsAdding(false); }}>Cancel</button>
+          </div>
+        ) : (
+          <button onClick={() => setIsAdding(true)}>
+            + new
+          </button>
+        )}
+      </div>
       
-      <ul>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+          <li key={todo.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', padding: '4px 0' }}>
+            <span>{todo.content}</span>
+            <button 
+              onClick={() => handleDeleteTodo(todo.id)}
+              style={{ 
+                background: '#ff4444', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '4px', 
+                padding: '4px 4px',
+                cursor: 'pointer'
+              }}
+            >
+              Delete
+            </button>
+          </li>
         ))}
       </ul>
     </div>
